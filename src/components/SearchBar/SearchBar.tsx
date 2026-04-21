@@ -1,0 +1,43 @@
+import css from "./SearchBar.module.css";
+
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+export default function SearchBar({ onSearch }: SearchBarProps) {
+  const handleSearch = (formData: FormData) => {
+    const query = formData.get("query") as string;
+    if (query === "") {
+      alert("Please enter search query!");
+    }
+    onSearch(query);
+  };
+
+  return (
+    <header className={css.header}>
+      <div className={css.container}>
+        <a
+          className={css.link}
+          href="https://www.themoviedb.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Powered by TMDB
+        </a>
+        <form action={handleSearch} className={css.form}>
+          <input
+            className={css.input}
+            type="text"
+            name="query"
+            autoComplete="off"
+            placeholder="Search movies..."
+            autoFocus
+          />
+          <button className={css.button} type="submit">
+            Search
+          </button>
+        </form>
+      </div>
+    </header>
+  );
+}
