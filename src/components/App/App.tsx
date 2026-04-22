@@ -17,10 +17,6 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const handleSearch = async (query: string) => {
-    if (!query.trim()) {
-      toast.error("Please enter search query!");
-      return;
-    }
     try {
       setIsLoading(true);
       setIsError(false);
@@ -57,10 +53,10 @@ export default function App() {
           },
         }}
       />
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSubmit={handleSearch} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies.length > 0 && <MovieGrid items={movies} onSelect={openModal} />}
+      {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
