@@ -1,13 +1,43 @@
 import { createPortal } from "react-dom";
 import css from "./MovieModal.module.css";
+import type { Movie } from "../../types/movie";
+import { useEffect } from "react";
 
 interface ModalProps {
+  movie: Movie;
   onClose: () => void;
 }
 
-export default function MovieModal({ onClose }: ModalProps) {
+export default function MovieModal({ movie, onClose }: ModalProps) {
+  const handleBackdropClik = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ): void => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    const handlekeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handlekeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handlekeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
   return createPortal(
-    <div className={css.backdrop} role="dialog" aria-modal="true">
+    <div
+      className={css.backdrop}
+      onClick={handleBackdropClik}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className={css.modal}>
         <button
           className={css.closeButton}
@@ -17,18 +47,18 @@ export default function MovieModal({ onClose }: ModalProps) {
           &times;
         </button>
         <img
-          src="https://image.tmdb.org/t/p/original/backdrop_path"
+          src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
           alt="movie_title"
           className={css.image}
         />
         <div className={css.content}>
-          <h2>movie_title</h2>
-          <p>movie_overview</p>
+          <h2>{movie.title}</h2>
+          <p>{movie.overview}</p>
           <p>
-            <strong>Release Date:</strong> movie_release_date
+            <strong>Release Date:</strong> {movie.release_date}
           </p>
           <p>
-            <strong>Rating:</strong> movie_vote_average/10
+            <strong>Rating:</strong> {movie.vote_average}/10
           </p>
         </div>
       </div>

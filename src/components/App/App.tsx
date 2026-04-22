@@ -4,24 +4,31 @@ import SearchBar from "../SearchBar/SearchBar.tsx";
 import MovieGrid from "../MovieGrid/MovieGrid.tsx";
 import Loader from "../Loader/Loader.tsx";
 import ErrorMessage from "../ErrorMessage/ErrorMessage.tsx";
-// import MovieModal from "../MovieModal/MovieModal.tsx";
+import MovieModal from "../MovieModal/MovieModal.tsx";
 import type { Movie } from "../../types/movie.ts";
 import { fetchMovies } from "../../services/movieService.ts";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      toast.error("Please enter search query!");
+      return;
+    }
     try {
       setIsLoading(true);
       setIsError(false);
       const data = await fetchMovies(query);
+      if (!data || data.length === 0) {
+        toast.error("No movies found for your request.");
+        return;
+      }
       setMovies(data);
     } catch {
       setIsError(true);
@@ -29,14 +36,34 @@ export default function App() {
       setIsLoading(false);
     }
   };
+
+  const openModal = (movie: Movie) => {
+    setSelectedMovie(movie);
+  };
+
+  const closeModal = () => {
+    setSelectedMovie(null);
+  };
+
   return (
     <div className={css.app}>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#111",
+            color: "#fff",
+          },
+        }}
+      />
       <SearchBar onSearch={handleSearch} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies.length > 0 && <MovieGrid items={movies} />}
-      {isModalOpen && <MovieGrid items={movies} onClick={openModal} />}
-      {/* <MovieModal /> */}
+      {movies.length > 0 && <MovieGrid items={movies} onSelect={openModal} />}
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={closeModal} />
+      )}
     </div>
   );
 }

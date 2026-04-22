@@ -7,9 +7,6 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch }: SearchBarProps) {
   const handleSearch = (formData: FormData) => {
     const query = formData.get("query") as string;
-    if (query === "") {
-      alert("Please enter search query!");
-    }
     onSearch(query);
   };
 
